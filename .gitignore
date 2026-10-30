@@ -1,0 +1,9 @@
+.chrome-debug-profile/
+.screenshots/
+.venv/
+
+**/**/__pycache__/
+
+**/node_modules/
+
+.env
