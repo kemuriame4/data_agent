@@ -45,7 +45,9 @@ SQL: SELECT sku, SUM(CASE WHEN is_returned THEN 1 ELSE 0 END)/COUNT(*) AS return
 def generate_sql(question: str, selected_tables: list, previous_error: str = "") -> str:
     schema = get_schema_prompt(selected_tables)
     metrics = "\n".join([f"{k}: {v}" for k, v in METRICS.items()])
-    prompt = TEXT_TO_SQL_PROMPT.format(schema=schema, metrics=metrics, question=question)
+    prompt = TEXT_TO_SQL_PROMPT.format(
+        schema=schema, metrics=metrics, question=question
+    )
     if previous_error:
         prompt += f"\nPrevious attempt failed with error: {previous_error}\nPlease correct the SQL."
     prompt += FEW_SHOT_EXAMPLES

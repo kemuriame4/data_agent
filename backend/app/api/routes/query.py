@@ -2,7 +2,11 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
 from app.api.dependencies import get_current_user
-from app.services.query_service import answer_question, attribution_report, hybrid_product_search
+from app.services.query_service import (
+    answer_question,
+    attribution_report,
+    hybrid_product_search,
+)
 
 router = APIRouter()
 
@@ -23,7 +27,12 @@ def ask(req: QueryRequest, user=Depends(get_current_user)):
 
 
 @router.post("/attribution")
-def attribution(model: str = "last_touch", days: int = 30, top_n: int = 10, user=Depends(get_current_user)):
+def attribution(
+    model: str = "last_touch",
+    days: int = 30,
+    top_n: int = 10,
+    user=Depends(get_current_user),
+):
     return {"model": model, "data": attribution_report(model, days, top_n)}
 
 

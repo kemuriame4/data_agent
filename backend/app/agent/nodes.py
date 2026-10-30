@@ -24,7 +24,9 @@ sandbox = SQLSandbox()
 
 def intent_routing_node(state: Dict[str, Any]) -> Dict[str, Any]:
     question = state["question"].lower()
-    if any(k in question for k in ["归因", "last-touch", "first-touch", "linear", "roas"]):
+    if any(
+        k in question for k in ["归因", "last-touch", "first-touch", "linear", "roas"]
+    ):
         intent = "attribution"
     elif any(k in question for k in ["图片", "相似", "沙发", "外观", "风格"]):
         intent = "hybrid_retrieval"
@@ -43,7 +45,9 @@ def schema_linking_node(state: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def text_to_sql_node(state: Dict[str, Any]) -> Dict[str, Any]:
-    sql = generate_sql(state["question"], state["selected_tables"], state.get("error_message", ""))
+    sql = generate_sql(
+        state["question"], state["selected_tables"], state.get("error_message", "")
+    )
     state["generated_sql"] = sql
     state["reasoning"].append(f"Generated SQL: {sql}")
     return state
@@ -62,7 +66,9 @@ def security_injection_node(state: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def execution_node(state: Dict[str, Any]) -> Dict[str, Any]:
-    ok, result, error = execute_readonly_sql(state["validated_sql"], timeout=settings.sql_timeout_seconds)
+    ok, result, error = execute_readonly_sql(
+        state["validated_sql"], timeout=settings.sql_timeout_seconds
+    )
     if ok:
         state["execution_result"] = result
         state["error_message"] = None
@@ -76,7 +82,9 @@ def execution_node(state: Dict[str, Any]) -> Dict[str, Any]:
 def self_correction_node(state: Dict[str, Any]) -> Dict[str, Any]:
     if state.get("error_message") and state["correction_count"] < 3:
         state["correction_count"] += 1
-        state["reasoning"].append(f"Self-correction attempt {state['correction_count']}")
+        state["reasoning"].append(
+            f"Self-correction attempt {state['correction_count']}"
+        )
         return "generate_sql"
     if not state.get("execution_result") and state["correction_count"] < 3:
         state["correction_count"] += 1

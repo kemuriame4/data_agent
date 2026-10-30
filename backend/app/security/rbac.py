@@ -17,7 +17,11 @@ class RBACPolicy:
         return self.role in allowed
 
     def get_allowed_columns(self, table: str) -> List[str]:
-        return [c for c, _ in get_table_columns(table).items() if self.can_access_column(table, c)]
+        return [
+            c
+            for c, _ in get_table_columns(table).items()
+            if self.can_access_column(table, c)
+        ]
 
     def get_row_filter(self, table: str) -> Optional[str]:
         if table == "orders" and self.warehouse_id is not None:

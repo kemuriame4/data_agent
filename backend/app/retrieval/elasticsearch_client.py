@@ -12,7 +12,9 @@ def get_es_client() -> Elasticsearch:
     global _client
     if _client is None:
         _client = Elasticsearch(
-            hosts=[f"http://{settings.elasticsearch_host}:{settings.elasticsearch_port}"]
+            hosts=[
+                f"http://{settings.elasticsearch_host}:{settings.elasticsearch_port}"
+            ]
         )
     return _client
 
@@ -50,6 +52,14 @@ def search_events(query: str, size: int = 20) -> List[Dict[str, Any]]:
     ensure_event_index()
     resp = es.search(
         index="event_logs",
-        body={"query": {"multi_match": {"query": query, "fields": ["query_text", "generated_sql"]}}, "size": size},
+        body={
+            "query": {
+                "multi_match": {
+                    "query": query,
+                    "fields": ["query_text", "generated_sql"],
+                }
+            },
+            "size": size,
+        },
     )
     return [hit["_source"] for hit in resp["hits"]["hits"]]

@@ -10,7 +10,15 @@ settings = get_settings()
 
 
 class SQLSandbox:
-    FORBIDDEN_KEYWORDS = {"drop", "delete", "update", "insert", "alter", "create", "truncate"}
+    FORBIDDEN_KEYWORDS = {
+        "drop",
+        "delete",
+        "update",
+        "insert",
+        "alter",
+        "create",
+        "truncate",
+    }
 
     def validate(self, sql: str) -> None:
         lowered = sql.lower()
@@ -31,7 +39,9 @@ class SQLSandbox:
             sql = sql.rstrip(";") + f" LIMIT {settings.max_sql_results}"
         return sql
 
-    def inject_row_filter(self, sql: str, rbac: RBACPolicy, selected_tables: list) -> str:
+    def inject_row_filter(
+        self, sql: str, rbac: RBACPolicy, selected_tables: list
+    ) -> str:
         filters = []
         for t in selected_tables:
             if t in get_all_tables():
@@ -43,16 +53,26 @@ class SQLSandbox:
         clause = " AND ".join(f"({f})" for f in filters)
         sql = sql.rstrip().rstrip(";")
 
-        tail = re.search(r"\b(group\s+by|having|order\s+by|limit)\b", sql, re.IGNORECASE)
+        tail = re.search(
+            r"\b(group\s+by|having|order\s+by|limit)\b", sql, re.IGNORECASE
+        )
         tail_start = tail.start() if tail else len(sql)
 
         where = re.search(r"\bwhere\b", sql, re.IGNORECASE)
         if where and where.start() < tail_start:
             insert_pos = tail_start
-            sql = sql[:insert_pos].rstrip() + f" AND {clause} " + sql[insert_pos:].lstrip()
+            sql = (
+                sql[:insert_pos].rstrip()
+                + f" AND {clause} "
+                + sql[insert_pos:].lstrip()
+            )
         else:
             insert_pos = tail_start
-            sql = sql[:insert_pos].rstrip() + f" WHERE {clause} " + sql[insert_pos:].lstrip()
+            sql = (
+                sql[:insert_pos].rstrip()
+                + f" WHERE {clause} "
+                + sql[insert_pos:].lstrip()
+            )
         return sql.strip()
 
     def apply(self, sql: str, rbac: RBACPolicy, selected_tables: list) -> str:

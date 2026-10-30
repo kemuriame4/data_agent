@@ -23,6 +23,10 @@ class TokenResponse(BaseModel):
 def login(req: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.username == req.username).first()
     if not user or not verify_password(req.password, user.hashed_password):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
-    token = create_access_token({"sub": user.username, "role": user.role, "warehouse_id": user.warehouse_id})
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
+        )
+    token = create_access_token(
+        {"sub": user.username, "role": user.role, "warehouse_id": user.warehouse_id}
+    )
     return {"access_token": token}

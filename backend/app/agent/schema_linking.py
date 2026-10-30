@@ -30,7 +30,9 @@ def select_tables(question: str) -> List[str]:
     resp = llm.invoke(prompt).content.strip()
     try:
         if "```" in resp:
-            resp = resp.split("```")[-2] if "```json" in resp else resp.replace("```", "")
+            resp = (
+                resp.split("```")[-2] if "```json" in resp else resp.replace("```", "")
+            )
         tables = json.loads(resp)
         if isinstance(tables, list):
             return [t for t in tables if t in get_all_tables()]

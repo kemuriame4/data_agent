@@ -43,10 +43,14 @@ def create_order_data(skus, days=90):
     start = end - timedelta(days=days)
     for i in range(1, 2001):
         sku_obj = random.choice(skus)
-        created = start + timedelta(seconds=random.randint(0, int((end - start).total_seconds())))
+        created = start + timedelta(
+            seconds=random.randint(0, int((end - start).total_seconds()))
+        )
         warehouse_id = random.choice(list(WAREHOUSES.keys()))
         platform = random.choice(PLATFORMS)
-        campaign = f"CAMP-{platform}-{random.randint(1, 5)}" if platform != "Organic" else None
+        campaign = (
+            f"CAMP-{platform}-{random.randint(1, 5)}" if platform != "Organic" else None
+        )
         qty = random.randint(1, 3)
         gmv = sku_obj.sale_price * qty
         data.append(
@@ -83,7 +87,9 @@ def create_ad_spend(days=90):
                         platform=platform,
                         campaign_id=f"CAMP-{platform}-{camp_idx}",
                         campaign_name=f"{platform} 推广 {camp_idx}",
-                        spend=Decimal(random.uniform(50, 500)).quantize(Decimal("0.01")),
+                        spend=Decimal(random.uniform(50, 500)).quantize(
+                            Decimal("0.01")
+                        ),
                         impressions=random.randint(1000, 50000),
                         clicks=random.randint(50, 2000),
                         conversions=random.randint(0, 50),
@@ -110,9 +116,23 @@ def create_inventory(skus):
 def create_users():
     return [
         User(username="admin", hashed_password=pwd_context.hash("admin"), role="admin"),
-        User(username="west_operator", hashed_password=pwd_context.hash("west"), role="operator", warehouse_id=1),
-        User(username="east_operator", hashed_password=pwd_context.hash("east"), role="operator", warehouse_id=2),
-        User(username="finance", hashed_password=pwd_context.hash("finance"), role="finance"),
+        User(
+            username="west_operator",
+            hashed_password=pwd_context.hash("west"),
+            role="operator",
+            warehouse_id=1,
+        ),
+        User(
+            username="east_operator",
+            hashed_password=pwd_context.hash("east"),
+            role="operator",
+            warehouse_id=2,
+        ),
+        User(
+            username="finance",
+            hashed_password=pwd_context.hash("finance"),
+            role="finance",
+        ),
     ]
 
 

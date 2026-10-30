@@ -22,11 +22,7 @@ def fetch_orders(start: datetime, end: datetime):
 
 def fetch_ad_spend(start: datetime, end: datetime):
     with get_db_session() as db:
-        return (
-            db.query(AdSpend)
-            .filter(AdSpend.date >= start, AdSpend.date < end)
-            .all()
-        )
+        return db.query(AdSpend).filter(AdSpend.date >= start, AdSpend.date < end).all()
 
 
 def last_touch_attribution(orders: list) -> Dict[str, float]:
