@@ -80,17 +80,24 @@ def execution_node(state: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def self_correction_node(state: Dict[str, Any]) -> Dict[str, Any]:
-    if state.get("error_message") and state["correction_count"] < 3:
-        state["correction_count"] += 1
-        state["reasoning"].append(
-            f"Self-correction attempt {state['correction_count']}"
-        )
-        return "generate_sql"
-    if not state.get("execution_result") and state["correction_count"] < 3:
-        state["correction_count"] += 1
+    """真正的节点：递增计数并把错误/空结果提示写回 state（供下一轮 Prompt 使用）。"""
+    state["correction_count"] += 1
+    if not state.get("error_message") and not state.get("execution_result"):
         state["error_message"] = "Empty result set"
-        state["reasoning"].append(f"Self-correction due to empty result")
-        return "generate_sql"
+    state["reasoning"].append(
+        f"Self-correction attempt {state['correction_count']}: {state.get('error_message')}"
+    )
+    return state
+
+
+def route_after_execution(state: Dict[str, Any]) -> str:
+    """纯路由函数：不修改 state。"""
+    if state["correction_count"] >= 3:
+        return "finalize"
+    if state.get("error_message"):
+        return "self_correction"
+    if not state.get("execution_result"):
+        return "self_correction"
     return "finalize"
 
 
